@@ -35,7 +35,6 @@ func AutoMigrate(connection *gorm.DB) {
 
 	connection.Debug().AutoMigrate(
 		&Models.User{},
-		&Models.Login{},
 	)
 	fmt.Println("Tablolar Oluşturuldu")
 
