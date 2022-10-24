@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dgrijalva/jwt-go/v4"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -36,7 +36,7 @@ func Login(c *fiber.Ctx) error {
 	}
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer:    strconv.Itoa(int(user.Id)),
-		ExpiresAt: jwt.NewTime(15000),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	})
 	token, err := claims.SignedString([]byte(SecretKey))
 
@@ -56,7 +56,7 @@ func Login(c *fiber.Ctx) error {
 	c.Cookie(&cookie)
 
 	return c.JSON(fiber.Map{
-		"message": "Success",
+		"message": "User login completed",
 	})
 
 }
@@ -64,7 +64,7 @@ func Login(c *fiber.Ctx) error {
 func UserLogin(c *fiber.Ctx) error {
 
 	cookie := c.Cookies("jwt")
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
 	})
 
@@ -81,7 +81,6 @@ func UserLogin(c *fiber.Ctx) error {
 }
 
 func Logout(c *fiber.Ctx) error {
-
 	cookie := fiber.Cookie{
 		Name:     "jwt",
 		Value:    "",
@@ -90,6 +89,6 @@ func Logout(c *fiber.Ctx) error {
 	}
 	c.Cookie(&cookie)
 	return c.JSON(fiber.Map{
-		"message": "Success",
+		"message": "User logout completed",
 	})
 }
